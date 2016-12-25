@@ -2,22 +2,33 @@
 # -*- coding: UTF-8 -*-
 
 import tkinter
-from PIL import Image, ImageTk
+from PIL import ImageTk
 
-def click_callback(event):
-    print("clicked at", event.x, event.y)
+class GUIHelper:
 
-def btn_click_callback():
-    print("clicked!")
+    def __init__(self, fatherClass, add_point_func, jump_out_func, rimg):
 
-root = tkinter.Tk()
-root.title("Captcha")
-frame = tkinter.Frame(root)
-frame.pack()
-pcimg = ImageTk.PhotoImage(Image.open("getPassCodeNew.jpg"))
-img = tkinter.Label(root, image=pcimg)
-img.bind("<Button-1>", click_callback)
-img.pack()
-b = tkinter.Button(root, text="I Finished!", command=btn_click_callback)
-b.pack()
-root.mainloop()
+        self.fatherClass = fatherClass
+        self.jump_out_func = jump_out_func
+        self.add_point_func = add_point_func
+
+        self.root = tkinter.Tk()
+        self.root.title("Captcha")
+        frame = tkinter.Frame(self.root)
+        frame.pack()
+        pcimg = ImageTk.PhotoImage(rimg)
+        img = tkinter.Label(self.root, image=pcimg)
+        img.bind("<Button-1>", self.click_callback)
+        img.pack()
+        b = tkinter.Button(self.root, text="I Finished!", command=self.jump_out_anonymous_func)
+        b.pack()
+        self.root.protocol("WM_DELETE_WINDOW", self.jump_out_anonymous_func)
+        self.root.mainloop()
+
+    def jump_out_anonymous_func(self):
+        self.jump_out_func(self.fatherClass)
+        self.root.destroy()
+
+    def click_callback(self, event):
+        print("clicked at", event.x, event.y)
+        self.add_point_func(self.fatherClass, event.x, event.y)
