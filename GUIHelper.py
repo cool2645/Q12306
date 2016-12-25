@@ -6,9 +6,8 @@ from PIL import ImageTk
 
 class GUIHelper:
 
-    def __init__(self, fatherClass, add_point_func, jump_out_func, rimg):
+    def __init__(self, add_point_func, jump_out_func, rimg):
 
-        self.fatherClass = fatherClass
         self.jump_out_func = jump_out_func
         self.add_point_func = add_point_func
 
@@ -26,9 +25,9 @@ class GUIHelper:
         self.root.mainloop()
 
     def jump_out_anonymous_func(self):
-        self.jump_out_func(self.fatherClass)
+        self.jump_out_func()
         self.root.destroy()
 
     def click_callback(self, event):
         print("clicked at", event.x, event.y)
-        self.add_point_func(self.fatherClass, event.x, event.y)
+        self.add_point_func(event.x, event.y)
