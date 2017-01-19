@@ -15,7 +15,7 @@ class BookHelper:
     # Constants
 
     rootUrl = "https://www.12306.cn"
-
+    initUrl = "https://kyfw.12306.cn/otn/login/init"
     def get_login_captcha_url(self):
         rand = random.uniform(0,1)
         return "https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&" + str(rand)
@@ -30,7 +30,7 @@ class BookHelper:
     captcha_str = ""
 
     def __init__(self):
-        self.s.get(self.rootUrl, verify=False)
+        self.s.get(self.initUrl, verify=False)
 
     def login(self, username, pwd):
 
