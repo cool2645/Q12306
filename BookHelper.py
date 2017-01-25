@@ -22,12 +22,14 @@ class BookHelper:
 
     checkCaptchaUrl = "https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn"
     loginUrl = "https://kyfw.12306.cn/otn/login/loginAysnSuggest"
+    stationUrl = "https://kyfw.12306.cn/otn/resources/js/framework/station_name.js"
 
     #
 
     s = requests.session()
     captcha_points = []
     captcha_str = ""
+    stations = {}
 
     def __init__(self):
         self.s.get(self.initUrl, verify=False)
@@ -104,10 +106,21 @@ class BookHelper:
         self.captcha_points.append(str(y))
         print(self.captcha_points)
 
+    def get_stations(self):
+        ss = self.s.get(self.stationUrl, verify = False)
+        ss = ss.text
+        sss = ss[ss.index('@') + 1 : ss.index(';') - 1]
+        stations = sss.split('@')
+        for station in stations:
+            tmp = station.split('|')
+            self.stations[tmp[1]] = tmp[2]
+        print(self.stations)
+
 test = BookHelper()
 config = configparser.ConfigParser()
 config.read("Q12306.cfg")
 username = config.get("user", "username")
 password = config.get("user", "password")
 
-test.login(username, password);
+#test.login(username, password)
+test.get_stations()
