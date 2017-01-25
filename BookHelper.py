@@ -23,6 +23,7 @@ class BookHelper:
     checkCaptchaUrl = "https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn"
     loginUrl = "https://kyfw.12306.cn/otn/login/loginAysnSuggest"
     stationUrl = "https://kyfw.12306.cn/otn/resources/js/framework/station_name.js"
+    queryTicketUrl = "https://kyfw.12306.cn/otn/leftTicket/queryZ"
 
     #
 
@@ -33,6 +34,7 @@ class BookHelper:
 
     def __init__(self):
         self.s.get(self.initUrl, verify=False)
+        self.get_stations()
 
     def login(self, username, pwd):
 
@@ -114,7 +116,13 @@ class BookHelper:
         for station in stations:
             tmp = station.split('|')
             self.stations[tmp[1]] = tmp[2]
-        print(self.stations)
+        #print(self.stations)
+
+    def query_ticket(self, fromStation, toStation, date, ppType):
+        fromStation = self.stations[fromStation]
+        toStation = self.stations[toStation]
+        r = self.s.get(self.queryTicketUrl + "?leftTicketDTO.train_date=" + date + "&leftTicketDTO.from_station=" + fromStation + "&leftTicketDTO.to_station=" + toStation + "&purpose_codes=" + ppType)
+        print(r.json())
 
 test = BookHelper()
 config = configparser.ConfigParser()
@@ -123,4 +131,4 @@ username = config.get("user", "username")
 password = config.get("user", "password")
 
 #test.login(username, password)
-test.get_stations()
+test.query_ticket("常州北", "沈阳", "2017-02-22", "ADULT")
