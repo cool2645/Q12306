@@ -1,0 +1,37 @@
+[{
+	"order":3,
+	"train_code":"K189",
+	"start_station":"沈阳",
+	"end_station":"沈阳北",
+	"passenger":[{
+		"id":"2333333333333",
+		"type":"成人"
+	}],
+	"date":"2015-01-24",
+	"seat_type":"硬卧"
+},
+{
+	"order":2,
+	"train_code":"K2047",
+	"start_station":"沈阳",
+	"end_station":"沈阳北",
+	"passenger":[{
+		"id":"233333333333333",
+		"type":"成人"
+	}],
+	"date":"2015-01-24",
+	"seat_type":"硬卧"
+},
+{
+	"order":1,
+	"train_code":"G1225",
+	"start_station":"沈阳",
+	"end_station":"沈阳北",
+	"passenger":[{
+		"id":"2333333333333333",
+		"type":"成人"
+	}],
+	"date":"2015-01-24",
+	"seat_type":"二等座"
+}
+]

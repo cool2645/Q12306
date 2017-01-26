@@ -5,6 +5,7 @@ import requests
 import random
 import configparser
 import time
+import json
 from PIL import Image, ImageFile
 from io import BytesIO
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -31,6 +32,7 @@ class BookHelper:
     captcha_points = []
     captcha_str = ""
     stations = {}
+    orders = []
 
     def __init__(self):
         self.s.get(self.initUrl, verify=False)
@@ -124,11 +126,23 @@ class BookHelper:
         r = self.s.get(self.queryTicketUrl + "?leftTicketDTO.train_date=" + date + "&leftTicketDTO.from_station=" + fromStation + "&leftTicketDTO.to_station=" + toStation + "&purpose_codes=" + ppType)
         print(r.json())
 
+    def get_profile(self, profile):
+        profile_file = open(profile)
+        try:
+            p = profile_file.read()
+        finally:
+            profile_file.close()
+        self.orders = json.loads(p)
+        self.orders.sort(key=lambda order:order['order'])
+        print(self.orders)
+
 test = BookHelper()
 config = configparser.ConfigParser()
 config.read("Q12306.cfg")
 username = config.get("user", "username")
 password = config.get("user", "password")
+profile = config.get("user", "profile")
 
+test.get_profile(profile)
 #test.login(username, password)
-test.query_ticket("常州北", "沈阳", "2017-02-22", "ADULT")
+test.query_ticket("沈阳", "沈阳北", "2017-02-22", "ADULT")
