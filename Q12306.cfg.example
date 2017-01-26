@@ -1,4 +1,6 @@
 [user]
-username=
-password=
-profile=
+username=your12306username
+password=your12306password
+[profile]
+# Your Profile Path
+profile=Q12306.json

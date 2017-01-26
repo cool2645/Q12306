@@ -1,4 +1,6 @@
 .idea
 *.pyc
 __pycache__
-Q12306.cfg
+*.cfg
+*.json
+*.swp

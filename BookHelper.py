@@ -71,6 +71,8 @@ class BookHelper:
             r = self.s.post(self.checkCaptchaUrl, headers=headers, data=data)
             r_array = r.json()
             print(self.s.cookies)
+            if r_array['status'] != True:
+                continue
             if r_array['data']['result'] == '1' :
                 break
 
@@ -120,11 +122,25 @@ class BookHelper:
             self.stations[tmp[1]] = tmp[2]
         #print(self.stations)
 
-    def query_ticket(self, fromStation, toStation, date, ppType):
+    def query_ticket(self, fromStation, toStation, trainCode, date, ppType):
         fromStation = self.stations[fromStation]
         toStation = self.stations[toStation]
-        r = self.s.get(self.queryTicketUrl + "?leftTicketDTO.train_date=" + date + "&leftTicketDTO.from_station=" + fromStation + "&leftTicketDTO.to_station=" + toStation + "&purpose_codes=" + ppType)
-        print(r.json())
+        while True:
+            r = self.s.get(self.queryTicketUrl + "?leftTicketDTO.train_date=" + date + "&leftTicketDTO.from_station=" + fromStation + "&leftTicketDTO.to_station=" + toStation + "&purpose_codes=" + ppType)
+            r = r.json()
+            if r['status']:
+                try:
+                    flag = False
+                    for train in r['data']:
+                        if train['queryLeftNewDTO']['station_train_code'] == trainCode :
+                            flag = True
+                            print(train)
+                            break
+                    if flag != True :
+                         print("There's no train qualifies your order!")
+                except:
+                    print(r['messages'])
+                break
 
     def get_profile(self, profile):
         profile_file = open(profile)
@@ -134,15 +150,16 @@ class BookHelper:
             profile_file.close()
         self.orders = json.loads(p)
         self.orders.sort(key=lambda order:order['order'])
-        print(self.orders)
+        for order in self.orders:
+            self.query_ticket(order['start_station'], order['end_station'], order['train_code'], order['date'], "ADULT")
 
 test = BookHelper()
 config = configparser.ConfigParser()
 config.read("Q12306.cfg")
 username = config.get("user", "username")
 password = config.get("user", "password")
-profile = config.get("user", "profile")
+profile = config.get("profile", "profile")
 
 test.get_profile(profile)
 #test.login(username, password)
-test.query_ticket("沈阳", "沈阳北", "2017-02-22", "ADULT")
+#test.query_ticket("沈阳", "沈阳北", "2017-02-22", "ADULT")
