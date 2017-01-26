@@ -143,7 +143,7 @@ class BookHelper:
                 break
 
     def get_profile(self, profile):
-        profile_file = open(profile)
+        profile_file = open(profile, encoding='UTF-8')
         try:
             p = profile_file.read()
         finally:
