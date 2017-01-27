@@ -35,10 +35,12 @@ class BookHelper:
     orders = []
 
     def __init__(self):
-        self.s.get(self.initUrl, verify=False)
         self.get_stations()
 
     def login(self, username, pwd):
+
+        self.s = requests.session()
+        self.s.get(self.initUrl, verify=False)
 
         while True:
 
@@ -46,11 +48,13 @@ class BookHelper:
             self.captcha_str = ""
 
             # get captcha pic and show window
-            r = self.s.get(self.get_login_captcha_url(), verify=False)
-            gui = GUIHelper.GUIHelper(self.set_point, self.login_call_back, Image.open(BytesIO(r.content)))
+            try:
+                r = self.s.get(self.get_login_captcha_url(), verify=False)
+                gui = GUIHelper.GUIHelper(self.set_point, self.login_call_back, Image.open(BytesIO(r.content)))
+            except:
+                continue
 
             # validate captcha
-            print("Is it async?")
 
             headers = {
                 'Host' : 'kyfw.12306.cn',
@@ -68,13 +72,19 @@ class BookHelper:
                 'randCode' : self.captcha_str,
                 'rand' : 'sjrand'
             }
-            r = self.s.post(self.checkCaptchaUrl, headers=headers, data=data)
-            r_array = r.json()
-            print(self.s.cookies)
-            if r_array['status'] != True:
-                continue
-            if r_array['data']['result'] == '1' :
+            while True:
+                r = self.s.post(self.checkCaptchaUrl, headers=headers, data=data)
+                try:
+                    r = r.json()
+                except:
+                    print("Server failed to response, retrying")
+                    continue
+                if r['status']:
+                    break
+            if r['data']['result'] == '1' :
+                print("Captcha passed, congratulations!")
                 break
+            print("You entered a wrong captcha")
 
         time.sleep(1)
 
@@ -97,13 +107,23 @@ class BookHelper:
             'userDTO.password': pwd,
             'randCode' : self.captcha_str
         }
-        r = self.s.post(self.loginUrl, headers=headers, data=data)
-        print(r.json())
-        print(self.s.cookies)
-
+        while True:
+            try:
+                r = self.s.post(self.loginUrl, headers=headers, data=data)
+                r = r.json()
+                if r['status']:
+                    print("Successfully logined")
+                    return True
+                else:
+                    print(r['messages'])
+                    print("Login fail, relogin")
+                    return False
+            except:
+                print("Server failed to response, retrying")
+                continue
 
     def login_call_back(self):
-        print("login call backed")
+        print("Captcha form call backed")
         self.captcha_str = ",".join(self.captcha_points)
         print(self.captcha_str)
 
@@ -150,6 +170,13 @@ class BookHelper:
             profile_file.close()
         self.orders = json.loads(p)
         self.orders.sort(key=lambda order:order['order'])
+
+    def go(self, username, password, profile):
+        while True:
+            r = self.login(username, password)
+            if r:
+                break
+        self.get_profile(profile)
         for order in self.orders:
             self.query_ticket(order['start_station'], order['end_station'], order['train_code'], order['date'], "ADULT")
 
@@ -160,6 +187,7 @@ username = config.get("user", "username")
 password = config.get("user", "password")
 profile = config.get("profile", "profile")
 
-test.get_profile(profile)
+test.go(username, password, profile)
+#test.get_profile(profile)
 #test.login(username, password)
 #test.query_ticket("沈阳", "沈阳北", "2017-02-22", "ADULT")
